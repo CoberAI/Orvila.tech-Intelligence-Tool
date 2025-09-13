@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competitor Intelligence Tool - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .demo-badge {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 15px;
+        }
+
+        .tool-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .form-section {
+            margin-bottom: 40px;
+        }
+
+        .form-section h2 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #34495e;
+        }
+
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #1e3a8a;
+        }
+
+        .analyze-btn {
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.3);
+        }
+
+        .analyze-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-container {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .competitor-profile {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 5px solid #1e3a8a;
+        }
+
+        .competitor-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .competitor-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .competitor-info h3 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .competitor-info p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 15px 12px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            min-height: 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+            word-break: break-word;
+            line-height: 1.2;
+            overflow-wrap: anywhere;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .chart-container h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .download-section {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .download-btn {
+            background: white;
+            color: #27ae60;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .section-title h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .pro-overlay {
+            position: relative;
+            margin-top: 40px;
+        }
+
+        .blurred-content {
+            filter: blur(4px);
+            pointer-events: none;
+            opacity: 0.5;
+            user-select: none;
+        }
+
+        .pro-banner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
+        .pro-banner h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .pro-banner p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .upgrade-btn {
+            background: white;
+            color: #1e3a8a;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upgrade-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Competitor Intelligence Tool</h1>
+            <p>Get instant insights on your competitors' pricing, features, and marketing strategies</p>
+            <div class="demo-badge">DEMO VERSION</div>
+        </div>
+
+        <div class="tool-container">
+            <div class="form-section">
+                <h2>
+                    <div class="section-icon">🎯</div>
+                    Select Your Market
+                </h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="niche">Choose Your Niche:</label>
+                        <select id="niche" onchange="updateSubniche()">
+                            <option value="">Select a niche...</option>
+                            <option value="saas">SaaS & Tech Startups</option>
+                            <option value="services">Professional Service Agencies</option>
+                            <option value="ecommerce">DTC/E-commerce Brands</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="subniche">Choose Market Segment:</label>
+                        <select id="subniche" disabled onchange="updateCompetitors()">
+                            <option value="">Select segment first...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="competitor">Select Competitor to Analyze:</label>
+                        <select id="competitor" disabled>
+                            <option value="">Select competitor...</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: end;">
+                        <button class="analyze-btn" onclick="analyzeCompetitor()" disabled id="analyzeBtn">
+                            🚀 Generate Analysis
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-container" id="resultsContainer">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+
+        <div class="section-title">
+            <h2>
+                <div class="section-icon">🔧</div>
+                Advanced Competitor Assessment Tools
+            </h2>
+            <p>Deep dive analytics, multi-competitor comparisons, and market positioning analysis</p>
+        </div>
+
+        <div class="pro-overlay">
+            <div class="blurred-content">
+                <div class="tool-container" style="margin-bottom: 0;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 30px;">
+                        <div style="background: linear-gradient(145deg, #f8f9fa, #e9ecef); padding: 25px; border-radius: 15px; border-left: 4px solid #1e3a8a;">
+                            <h4 style="color: #1e3a8a; margin-bottom: 15px; font-size: 1.3rem;">📊 Multi-Competitor Matrix</h4>
+                            <p style="color: #6b7280; line-height: 1.6;">Compare up to 10 competitors side-by-side with advanced filtering and sorting capabilities.</p>
+                        </div>
+                        <div style="background: linear-gradient(145deg, #f8f9fa, #e9ecef); padding: 25px; border-radius: 15px; border-left: 4px solid #1e3a8a;">
+                            <h4 style="color: #1e3a8a; margin-bottom: 15px; font-size: 1.3rem;">💰 Pricing Strategy AI</h4>
+                            <p style="color: #6b7280; line-height: 1.6;">Get AI-powered pricing recommendations based on comprehensive market analysis.</p>
+                        </div>
+                        <div style="background: linear-gradient(145deg, #f8f9fa, #e9ecef); padding: 25px; border-radius: 15px; border-left: 4px solid #1e3a8a;">
+                            <h4 style="color: #1e3a8a; margin-bottom: 15px; font-size: 1.3rem;">🎯 Feature Gap Analysis</h4>
+                            <p style="color: #6b7280; line-height: 1.6;">Identify missing features and market opportunities with detailed gap analysis.</p>
+                        </div>
+                        <div style="background: linear-gradient(145deg, #f8f9fa, #e9ecef); padding: 25px; border-radius: 15px; border-left: 4px solid #1e3a8a;">
+                            <h4 style="color: #1e3a8a; margin-bottom: 15px; font-size: 1.3rem;">📈 Market Trend Tracking</h4>
+                            <p style="color: #6b7280; line-height: 1.6;">Monitor competitor changes, pricing updates, and market movements in real-time.</p>
+                        </div>
+                        <div style="background: linear-gradient(145deg, #f8f9fa, #e9ecef); padding: 25px; border-radius: 15px; border-left: 4px solid #1e3a8a;">
+                            <h4 style="color: #1e3a8a; margin-bottom: 15px; font-size: 1.3rem;">🚀 Marketing Intelligence</h4>
+                            <p style="color: #6b7280; line-height: 1.6;">Analyze competitor marketing channels, ad spend, and campaign performance.</p>
+                        </div>
+                        <div style="background: linear-gradient(145deg, #f8f9fa, #e9ecef); padding: 25px; border-radius: 15px; border-left: 4px solid #1e3a8a;">
+                            <h4 style="color: #1e3a8a; margin-bottom: 15px; font-size: 1.3rem;">📋 Custom Reports</h4>
+                            <p style="color: #6b7280; line-height: 1.6;">Generate branded PDF reports with custom insights, charts, and recommendations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pro-banner">
+                <h3>🚀 Premium Features Available</h3>
+                <p>Unlock the complete competitor intelligence platform with advanced analytics, AI insights, and team collaboration tools</p>
+                <button class="upgrade-btn" onclick="window.open('mailto:contact@example.com?subject=Pro Version Inquiry', '_blank')">Contact for Demo</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const competitorData = {
+            saas: {
+                'low-end': {
+                    name: 'Low-End SaaS Tools ($5-50/month)',
+                    competitors: [
+                        {
+                            name: 'Zapier',
+                            description: 'Automation platform for connecting apps',
+                            logo: 'linear-gradient(135deg, #ff6b35, #f7931e)',
+                            logoText: 'Z',
+                            pricing: '$19.99 - $599/month',
+                            marketCap: '$5B',
+                            employees: '800+',
+                            founded: '2011',
+                            features: {
+                                'Core Features': ['5,000+ App Integrations', 'Multi-Step Workflows', 'Conditional Logic', 'Webhooks'],
+                                'Advanced Features': ['Custom Functions', 'Error Handling', 'Team Collaboration', 'Advanced Filters'],
+                                'Enterprise': ['SSO Integration', 'Advanced Security', 'Dedicated Support', 'Custom Pricing']
+                            }
+                        },
+                        {
+                            name: 'Notion',
+                            description: 'All-in-one workspace with AI capabilities',
+                            logo: 'linear-gradient(135deg, #000000, #333333)',
+                            logoText: 'N',
+                            pricing: '$8 - $25/user/month',
+                            marketCap: '$10B',
+                            employees: '500+',
+                            founded: '2016',
+                            features: {
+                                'Core Features': ['Databases', 'AI Writing Assistant', 'Templates', 'Real-time Collaboration'],
+                                'Advanced Features': ['API Access', 'Advanced Permissions', 'Custom Properties', 'Automation'],
+                                'Enterprise': ['SAML SSO', 'Advanced Security', 'Audit Logs', 'Custom Contracts']
+                            }
+                        }
+                    ]
+                },
+                'mid-end': {
+                    name: 'Mid-Range SaaS Tools ($50-200/month)',
+                    competitors: [
+                        {
+                            name: 'Monday.com',
+                            description: 'Work management platform with AI insights',
+                            logo: 'linear-gradient(135deg, #ff3d71, #ff006e)',
+                            logoText: 'M',
+                            pricing: '$8 - $24/user/month',
+                            marketCap: '$8B',
+                            employees: '1,500+',
+                            founded: '2012',
+                            features: {
+                                'Core Features': ['Project Management', 'Custom Workflows', 'Time Tracking', 'Gantt Charts'],
+                                'Advanced Features': ['Automation', 'Advanced Analytics', 'Integrations Hub', 'Custom Apps'],
+                                'Enterprise': ['Enterprise Security', 'Advanced Reporting', 'Multi-level Permissions', '24/7 Support']
+                            }
+                        },
+                        {
+                            name: 'Airtable',
+                            description: 'Database-spreadsheet hybrid with automation',
+                            logo: 'linear-gradient(135deg, #18bfff, #1ba3d1)',
+                            logoText: 'A',
+                            pricing: '$10 - $45/user/month',
+                            marketCap: '$11B',
+                            employees: '1,000+',
+                            founded: '2012',
+                            features: {
+                                'Core Features': ['Relational Databases', 'Views & Filters', 'Collaboration', 'Mobile Apps'],
+                                'Advanced Features': ['Automations', 'Advanced Formulas', 'Extensions', 'API Access'],
+                                'Enterprise': ['Admin Panel', 'SAML SSO', 'Audit Logs', 'Advanced Permissions']
+                            }
+                        }
+                    ]
+                },
+                'high-end': {
+                    name: 'Enterprise SaaS Tools ($200+/month)',
+                    competitors: [
+                        {
+                            name: 'Salesforce',
+                            description: 'Enterprise CRM and automation platform',
+                            logo: 'linear-gradient(135deg, #00a1e0, #0070d2)',
+                            logoText: 'S',
+                            pricing: '$25 - $300/user/month',
+                            marketCap: '$200B',
+                            employees: '70,000+',
+                            founded: '1999',
+                            features: {
+                                'Core Features': ['CRM', 'Sales Cloud', 'Service Cloud', 'Marketing Cloud'],
+                                'Advanced Features': ['AI Einstein', 'Custom Development', 'Advanced Analytics', 'AppExchange'],
+                                'Enterprise': ['Unlimited Customization', 'Dedicated Support', 'Advanced Security', 'Multi-Cloud']
+                            }
+                        },
+                        {
+                            name: 'HubSpot',
+                            description: 'Inbound marketing and sales platform',
+                            logo: 'linear-gradient(135deg, #ff7a59, #ff5722)',
+                            logoText: 'H',
+                            pricing: '$45 - $3,200/month',
+                            marketCap: '$25B',
+                            employees: '5,000+',
+                            founded: '2006',
+                            features: {
+                                'Core Features': ['Marketing Hub', 'Sales Hub', 'Service Hub', 'CMS Hub'],
+                                'Advanced Features': ['Marketing Automation', 'Custom Objects', 'Advanced Reporting', 'AI Tools'],
+                                'Enterprise': ['Advanced Permissions', 'Custom Events', 'Predictive Lead Scoring', 'Dedicated Support']
+                            }
+                        }
+                    ]
+                }
+            },
+            services: {
+                'low-end': {
+                    name: 'Small Agencies ($1K-5K/month)',
+                    competitors: [
+                        {
+                            name: 'WebFX',
+                            description: 'Full-service digital marketing agency',
+                            logo: 'linear-gradient(135deg, #4CAF50, #45a049)',
+                            logoText: 'W',
+                            pricing: '$1,500 - $5,000/month',
+                            marketCap: 'Private',
+                            employees: '500+',
+                            founded: '1996',
+                            features: {
+                                'Core Services': ['SEO', 'PPC', 'Web Design', 'Social Media'],
+                                'Specialized': ['E-commerce', 'Lead Generation', 'Content Marketing', 'Email Marketing'],
+                                'Enterprise': ['Custom Strategy', 'Dedicated Team', 'Advanced Analytics', 'Multi-location']
+                            }
+                        },
+                        {
+                            name: 'Thrive Agency',
+                            description: 'Digital marketing and web design agency',
+                            logo: 'linear-gradient(135deg, #FF9800, #F57C00)',
+                            logoText: 'T',
+                            pricing: '$2,000 - $8,000/month',
+                            marketCap: 'Private',
+                            employees: '200+',
+                            founded: '2005',
+                            features: {
+                                'Core Services': ['SEO', 'PPC', 'Web Development', 'Content Marketing'],
+                                'Specialized': ['E-commerce', 'Local SEO', 'Conversion Optimization', 'Brand Strategy'],
+                                'Enterprise': ['Custom Solutions', 'Account Management', 'Advanced Reporting', 'Multi-channel']
+                            }
+                        }
+                    ]
+                },
+                'mid-end': {
+                    name: 'Mid-Size Agencies ($5K-25K/month)',
+                    competitors: [
+                        {
+                            name: 'Ignite Digital',
+                            description: 'Performance-driven digital marketing agency',
+                            logo: 'linear-gradient(135deg, #E91E63, #C2185B)',
+                            logoText: 'I',
+                            pricing: '$5,000 - $25,000/month',
+                            marketCap: 'Private',
+                            employees: '100+',
+                            founded: '2008',
+                            features: {
+                                'Core Services': ['Paid Search', 'SEO', 'Social Advertising', 'Analytics'],
+                                'Specialized': ['Performance Marketing', 'Conversion Optimization', 'Marketing Automation', 'Attribution'],
+                                'Enterprise': ['Custom Attribution', 'Advanced Analytics', 'Dedicated Teams', 'Strategic Consulting']
+                            }
+                        },
+                        {
+                            name: 'Coalition Technologies',
+                            description: 'Award-winning digital marketing agency',
+                            logo: 'linear-gradient(135deg, #2196F3, #1976D2)',
+                            logoText: 'C',
+                            pricing: '$3,000 - $15,000/month',
+                            marketCap: 'Private',
+                            employees: '150+',
+                            founded: '2009',
+                            features: {
+                                'Core Services': ['SEO', 'PPC', 'Web Design', 'E-commerce'],
+                                'Specialized': ['Amazon Marketing', 'Conversion Rate Optimization', 'Email Marketing', 'Brand Development'],
+                                'Enterprise': ['Custom Development', 'Advanced Analytics', 'Strategic Planning', 'Multi-platform']
+                            }
+                        }
+                    ]
+                },
+                'high-end': {
+                    name: 'Enterprise Agencies ($25K+/month)',
+                    competitors: [
+                        {
+                            name: 'McKinsey Digital',
+                            description: 'Digital transformation consulting',
+                            logo: 'linear-gradient(135deg, #1a237e, #303f9f)',
+                            logoText: 'M',
+                            pricing: '$50,000 - $500,000/month',
+                            marketCap: 'Private',
+                            employees: '30,000+',
+                            founded: '1926',
+                            features: {
+                                'Core Services': ['Digital Strategy', 'Technology Implementation', 'Data Analytics', 'Organizational Change'],
+                                'Specialized': ['AI/ML Implementation', 'Cloud Migration', 'Digital Operating Model', 'Agile Transformation'],
+                                'Enterprise': ['C-Suite Advisory', 'Custom Solutions', 'Global Delivery', 'Industry Expertise']
+                            }
+                        },
+                        {
+                            name: 'Accenture Interactive',
+                            description: 'End-to-end digital experience agency',
+                            logo: 'linear-gradient(135deg, #A100FF, #7B1FA2)',
+                            logoText: 'A',
+                            pricing: '$25,000 - $1M+/month',
+                            marketCap: '$150B',
+                            employees: '40,000+',
+                            founded: '2009',
+                            features: {
+                                'Core Services': ['Experience Design', 'Marketing Strategy', 'Commerce Solutions', 'Content & Campaign'],
+                                'Specialized': ['Personalization at Scale', 'Marketing Technology', 'Customer Analytics', 'Brand Transformation'],
+                                'Enterprise': ['Global Capabilities', 'Industry Solutions', 'Innovation Labs', 'Strategic Partnerships']
+                            }
+                        }
+                    ]
+                }
+            },
+            ecommerce: {
+                'low-end': {
+                    name: 'Small DTC Brands ($10K-100K revenue)',
+                    competitors: [
+                        {
+                            name: 'Allbirds',
+                            description: 'Sustainable footwear and apparel',
+                            logo: 'linear-gradient(135deg, #212529, #495057)',
+                            logoText: 'A',
+                            pricing: '$95 - $145/product',
+                            marketCap: '$2B',
+                            employees: '500+',
+                            founded: '2016',
+                            features: {
+                                'Core Products': ['Tree Runners', 'Wool Runners', 'Tree Dashers', 'Apparel Line'],
+                                'Marketing': ['Sustainability Focus', 'Social Media', 'Influencer Partnerships', 'Content Marketing'],
+                                'Operations': ['Direct-to-Consumer', 'Retail Stores', 'International Shipping', 'Carbon Neutral']
+                            }
+                        },
+                        {
+                            name: 'Warby Parker',
+                            description: 'Direct-to-consumer eyewear brand',
+                            logo: 'linear-gradient(135deg, #00A8CC, #0085A3)',
+                            logoText: 'W',
+                            pricing: '$95 - $195/pair',
+                            marketCap: '$3B',
+                            employees: '2,500+',
+                            founded: '2010',
+                            features: {
+                                'Core Products': ['Prescription Glasses', 'Sunglasses', 'Contact Lenses', 'Accessories'],
+                                'Marketing': ['Home Try-On', 'Social Impact', 'Content Marketing', 'Retail Experience'],
+                                'Operations': ['Omnichannel', 'Virtual Try-On', 'Insurance Integration', 'Social Mission']
+                            }
+                        }
+                    ]
+                },
+                'mid-end': {
+                    name: 'Mid-Size DTC Brands ($100K-1M revenue)',
+                    competitors: [
+                        {
+                            name: 'Glossier',
+                            description: 'Beauty and skincare brand',
+                            logo: 'linear-gradient(135deg, #FFB6C1, #FF69B4)',
+                            logoText: 'G',
+                            pricing: '$12 - $65/product',
+                            marketCap: '$1.8B',
+                            employees: '300+',
+                            founded: '2014',
+                            features: {
+                                'Core Products': ['Skincare', 'Makeup', 'Body Care', 'Fragrance'],
+                                'Marketing': ['Community-Driven', 'User-Generated Content', 'Influencer Marketing', 'Social Commerce'],
+                                'Operations': ['DTC Focus', 'Retail Locations', 'International Expansion', 'Limited Editions']
+                            }
+                        },
+                        {
+                            name: 'Away',
+                            description: 'Travel luggage and accessories',
+                            logo: 'linear-gradient(135deg, #4ECDC4, #44A08D)',
+                            logoText: 'A',
+                            pricing: '$225 - $595/product',
+                            marketCap: '$1.4B',
+                            employees: '200+',
+                            founded: '2015',
+                            features: {
+                                'Core Products': ['Carry-Ons', 'Checked Luggage', 'Travel Accessories', 'Personal Items'],
+                                'Marketing': ['Content Marketing', 'Travel Stories', 'Partnerships', 'Retail Showrooms'],
+                                'Operations': ['Global Shipping', 'Lifetime Warranty', 'Travel Services', 'Customization']
+                            }
+                        }
+                    ]
+                },
+                'high-end': {
+                    name: 'Large DTC Brands ($1M+ revenue)',
+                    competitors: [
+                        {
+                            name: 'Casper',
+                            description: 'Sleep products and mattresses',
+                            logo: 'linear-gradient(135deg, #3D5A80, #293241)',
+                            logoText: 'C',
+                            pricing: '$395 - $2,695/product',
+                            marketCap: '$1.1B',
+                            employees: '800+',
+                            founded: '2014',
+                            features: {
+                                'Core Products': ['Mattresses', 'Pillows', 'Bedding', 'Furniture'],
+                                'Marketing': ['Sleep Education', 'Content Marketing', 'Retail Partnerships', 'Sleep Studies'],
+                                'Operations': ['100-Night Trial', 'White Glove Delivery', 'Retail Stores', 'B2B Sales']
+                            }
+                        },
+                        {
+                            name: 'Peloton',
+                            description: 'Connected fitness equipment and content',
+                            logo: 'linear-gradient(135deg, #000000, #1C1C1E)',
+                            logoText: 'P',
+                            pricing: '$1,445 - $2,495/equipment',
+                            marketCap: '$8B',
+                            employees: '2,800+',
+                            founded: '2012',
+                            features: {
+                                'Core Products': ['Bikes', 'Treadmills', 'Accessories', 'Digital Membership'],
+                                'Marketing': ['Community Building', 'Influencer Instructors', 'Social Features', 'Premium Experience'],
+                                'Operations': ['Subscription Model', 'Live Classes', 'Global Delivery', 'Customer Support']
+                            }
+                        }
+                    ]
+                }
+            }
+        };
+
+        function updateSubniche() {
+            const niche = document.getElementById('niche').value;
+            const subnicheSelect = document.getElementById('subniche');
+            const competitorSelect = document.getElementById('competitor');
+            
+            // Reset dependent dropdowns
+            subnicheSelect.innerHTML = '<option value="">Select segment...</option>';
+            competitorSelect.innerHTML = '<option value="">Select competitor...</option>';
+            competitorSelect.disabled = true;
+            document.getElementById('analyzeBtn').disabled = true;
+            
+            if (niche) {
+                subnicheSelect.disabled = false;
+                const segments = competitorData[niche];
+                
+                Object.keys(segments).forEach(segment => {
+                    const option = document.createElement('option');
+                    option.value = segment;
+                    option.textContent = segments[segment].name;
+                    subnicheSelect.appendChild(option);
+                });
+            } else {
+                subnicheSelect.disabled = true;
+            }
+        }
+
+        function updateCompetitors() {
+            const niche = document.getElementById('niche').value;
+            const subniche = document.getElementById('subniche').value;
+            const competitorSelect = document.getElementById('competitor');
+            
+            competitorSelect.innerHTML = '<option value="">Select competitor...</option>';
+            document.getElementById('analyzeBtn').disabled = true;
+            
+            if (niche && subniche) {
+                competitorSelect.disabled = false;
+                const competitors = competitorData[niche][subniche].competitors;
+                
+                competitors.forEach((competitor, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = competitor.name;
+                    competitorSelect.appendChild(option);
+                });
+            } else {
+                competitorSelect.disabled = true;
+            }
+        }
+
+        function analyzeCompetitor() {
+            const niche = document.getElementById('niche').value;
+            const subniche = document.getElementById('subniche').value;
+            const competitorIndex = document.getElementById('competitor').value;
+            
+            if (niche && subniche && competitorIndex !== '') {
+                const competitor = competitorData[niche][subniche].competitors[competitorIndex];
+                displayResults(competitor, niche);
+            }
+        }
+
+        function displayResults(competitor, niche) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            const resultsHTML = `
+                <div class="competitor-profile">
+                    <div class="competitor-header">
+                        <div class="competitor-logo" style="background: ${competitor.logo}">
+                            ${competitor.logoText}
+                        </div>
+                        <div class="competitor-info">
+                            <h3>${competitor.name}</h3>
+                            <p>${competitor.description}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">${competitor.pricing}</div>
+                            <div class="metric-label">Pricing Range</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">${competitor.marketCap}</div>
+                            <div class="metric-label">Market Cap</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">${competitor.employees}</div>
+                            <div class="metric-label">Team Size</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">${competitor.founded}</div>
+                            <div class="metric-label">Founded</div>
+                        </div>
+                    </div>
+                    
+                    <div class="features-section">
+                        <h3 style="color: #2c3e50; margin-bottom: 20px;">Product/Service Features</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                            ${Object.entries(competitor.features).map(([category, features]) => `
+                                <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                                    <h4 style="color: #2c3e50; margin-bottom: 15px; font-size: 1.2rem;">${category}</h4>
+                                    <ul style="list-style: none; padding: 0;">
+                                        ${features.map(feature => `
+                                            <li style="padding: 5px 0; display: flex; align-items: center; gap: 8px;">
+                                                <span style="color: #27ae60; font-weight: bold;">✓</span>
+                                                ${feature}
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="download-section">
+                    <h3>📄 Download Your Competitor Report</h3>
+                    <p>Get a comprehensive PDF report with all the insights, charts, and actionable recommendations</p>
+                    <button class="download-btn" onclick="downloadReport('${competitor.name}')">
+                        Download PDF Report
+                    </button>
+                </div>
+            `;
+            
+            resultsContainer.innerHTML = resultsHTML;
+            resultsContainer.style.display = 'block';
+            
+            // Smooth scroll to results
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function downloadReport(competitorName) {
+            // Simulate PDF generation
+            const loadingBtn = event.target;
+            const originalText = loadingBtn.textContent;
+            
+            loadingBtn.textContent = 'Generating PDF...';
+            loadingBtn.disabled = true;
+            
+            setTimeout(() => {
+                // Generate PDF from current page content
+                const printContent = document.getElementById('resultsContainer').innerHTML;
+                const originalContent = document.body.innerHTML;
+                
+                // Create a new window for PDF generation
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Competitor Analysis Report - ${competitorName}</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            .competitor-profile { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; }
+                            .competitor-header { display: flex; align-items: center; margin-bottom: 20px; }
+                            .competitor-logo { width: 50px; height: 50px; margin-right: 15px; border-radius: 10px; }
+                            .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }
+                            .metric-card { border: 1px solid #ddd; padding: 15px; text-align: center; }
+                            .metric-value { font-size: 1.2rem; font-weight: bold; color: #1e3a8a; }
+                            .metric-label { font-size: 0.9rem; color: #666; }
+                            .features-section h3 { color: #2c3e50; margin: 20px 0 15px 0; }
+                            .download-section, .chart-container { display: none; }
+                            h1 { color: #1e3a8a; text-align: center; margin-bottom: 30px; }
+                            .report-header { text-align: center; margin-bottom: 40px; }
+                            .report-date { color: #666; font-size: 0.9rem; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="report-header">
+                            <h1>Competitor Intelligence Report</h1>
+                            <p class="report-date">Generated: ${new Date().toLocaleDateString()}</p>
+                            <p><strong>Demo Version</strong> - Upgrade for comprehensive analysis</p>
+                        </div>
+                        ${printContent}
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                
+                // Trigger print dialog
+                setTimeout(() => {
+                    printWindow.print();
+                    printWindow.close();
+                }, 500);
+                
+                loadingBtn.textContent = originalText;
+                loadingBtn.disabled = false;
+                
+                // Show success message
+                alert('PDF generated! Use your browser\'s print dialog to save as PDF. Upgrade to Pro for automated PDF reports with advanced analytics.');
+            }, 2000);
+        }
+
+        // Enable analyze button when competitor is selected
+        document.getElementById('competitor').addEventListener('change', function() {
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            if (this.value !== '') {
+                analyzeBtn.disabled = false;
+            } else {
+                analyzeBtn.disabled = true;
+            }
+        });
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate form sections on load
+            const sections = document.querySelectorAll('.form-section, .tool-container');
+            sections.forEach((section, index) => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    section.style.transition = 'all 0.6s ease';
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+    </script>
+</body>
+</html>
